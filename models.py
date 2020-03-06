@@ -1,7 +1,9 @@
 from lolesports_api.downloaders import downloadMeta, downloadDetails
-import glob, json, os
-import numpy as np
-import pandas as pd
+import glob as _glob
+import json as _json
+import os as _os
+import numpy as _np
+import pandas as _pd
 
 def dictToAttr(self, dict):
     for key, value in dict.items():
@@ -29,7 +31,7 @@ class League():
 
     def download(self, folder='.', **kwargs):
         folder = f'{folder}/{self.slug}'
-        os.makedirs(folder, exist_ok=True)
+        _os.makedirs(folder, exist_ok=True)
         for tournamentSlug in [t['slug'] for t in self.tournaments]:
             split = self.getTournament(tournamentSlug)
             split.download(folder=folder, **kwargs)
@@ -60,7 +62,7 @@ class Tournament():
 
     def download(self, folder='.', **kwargs):
         folder = f'{folder}/{self.slug}'
-        os.makedirs(folder, exist_ok=True)
+        _os.makedirs(folder, exist_ok=True)
         for eventId in [e['match']['id'] for e in self.events]:
             event = self.getEvent(eventId)
             event.download(folder=folder, **kwargs)
@@ -117,10 +119,10 @@ class Game():
     def download(self, folder='.', verbose=True, overwrite=False):
         try:
             fname = f'{folder}/{self.id}.json'
-            if (not os.path.isfile(fname)) or (overwrite):
+            if (not _os.path.isfile(fname)) or (overwrite):
                 gameData = downloadDetails(self.id)
                 with open(fname, 'w') as fp:
-                    json.dump(gameData, fp)
+                    _json.dump(gameData, fp)
                 if verbose:
                     print(f'Finished writing to {fname}')
             else:
@@ -131,23 +133,23 @@ class Game():
             print(e)
 
     def loadData(self):
-        fname = glob.glob(f'*/*/{self.id}.json')
+        fname = _glob.glob(f'*/*/{self.id}.json')
         assert len(fname) > 0, 'No game data file found!'
         assert len(fname) < 2, f'Multiple game data files found: {fname}'            
         with open(fname[0], 'r') as f:
-            gameData = json.load(f)
+            gameData = _json.load(f)
         self.json = gameData
         self._filename = fname[0]
 
     def parseData(self):
         ## Parse Time
-        time = np.array([frame['rfc460Timestamp'][:-1] for frame in self.json['frames']], dtype=np.datetime64)
+        time = _np.array([frame['rfc460Timestamp'][:-1] for frame in self.json['frames']], dtype=_np.datetime64)
         # time is seconds since the SECOND timestamp. I believe the first timestamp is when they start loading in...
-        time = (time - time[1])/np.timedelta64(1, 's')
+        time = (time - time[1])/_np.timedelta64(1, 's')
         pauseIdxs = [idx for idx, frame in enumerate(self.json['frames']) if frame['gameState']=='paused']
         for pIdx in pauseIdxs:
             time[pIdx+1:] -= time[pIdx+1] - time[pIdx]
-        self._timeIndex = pd.TimedeltaIndex(time)
+        self._timeIndex = _pd.TimedeltaIndex(time)
 
         
         self.red = Team(self, 'red')
@@ -162,7 +164,7 @@ class Team():
         self._side = side
 
 
-        self.data = pd.DataFrame([frame[side + 'Team'] for frame in game.json['frames']])
+        self.data = _pd.DataFrame([frame[side + 'Team'] for frame in game.json['frames']])
 
         self.top = Participant(self, 'top')
         self.jungle = Participant(self, 'jungle')
@@ -177,7 +179,7 @@ class Participant():
     def __init__(self, team, role):
         teamParticipantData = team._game.json['gameMetadata'][team._side+'TeamMetadata']['participantMetadata']
         participantData = [p for p in teamParticipantData if p['role'] == role][0]
-        self.data = pd.DataFrame(
+        self.data = _pd.DataFrame(
             [[pFrame for pFrame in pGroup if pFrame['participantId'] == participantData['participantId']][0] 
                 for pGroup in team.data['participants']])
         dictToAttr(self, participantData)
