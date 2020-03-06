@@ -34,5 +34,9 @@ tsm_vs_clg.parseData()
 
 tsm_vs_clg.red.top.data
 # returns a pandas dataframe of all data recorded by a player
-
 ```
+
+All the games for a tournament or league can be downloaded automatically as well, though it can take a long time (~8hrs)
+```
+lcs.download() # Downloads all games for all tournaments in the LCS
+springSplit.download() # Downloads all (completed) games for spring split 2020
