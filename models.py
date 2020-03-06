@@ -113,6 +113,7 @@ class Game():
         if autoLoad:
             try:
                 self.loadData()
+                self.parseData()
             except AssertionError:
                 pass
 
