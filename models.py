@@ -79,16 +79,16 @@ class Event():
 
         self.games = self.data['match']['games']
 
-    def getGame(self, gameId):
+    def getGame(self, gameId, **kwargs):
         gameData = {
             'winner': [team['name'] for team in self.data['match']['teams'] if team['result']['gameWins'] == 1][0],
             'teams': self.data['match']['teams']            
         }
-        return Game(self.id, gameId, gameData)
+        return Game(self.id, gameId, gameData, **kwargs)
 
-    def getGameByNum(self, gameNum):
+    def getGameByNum(self, gameNum, **kwargs):
         gameId = [game['id'] for game in self.games if game['number'] == gameNum][0]
-        return self.getGame(gameId)
+        return self.getGame(gameId, **kwargs)
     
     def download(self, **kwargs):
         for gameId in [g['id'] for g in self.games]:
