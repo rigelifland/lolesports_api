@@ -163,7 +163,11 @@ class Team():
     def __init__(self, game, side):
         self._game = game
         self._side = side
+        teamId = game.json['gameMetadata'][side+'TeamMetadata']['esportsTeamId']
 
+        queryData = downloadMeta('getTeams', params={'id': teamId})
+        teamData = queryData['data']['teams'][0]
+        dictToAttr(self, teamData)
 
         self.data = _pd.DataFrame([frame[side + 'Team'] for frame in game.json['frames']])
 
@@ -178,9 +182,11 @@ class Team():
 
 class Participant():
     def __init__(self, team, role):
+        self._team = team
         teamParticipantData = team._game.json['gameMetadata'][team._side+'TeamMetadata']['participantMetadata']
         participantData = [p for p in teamParticipantData if p['role'] == role][0]
         self.data = _pd.DataFrame(
             [[pFrame for pFrame in pGroup if pFrame['participantId'] == participantData['participantId']][0] 
                 for pGroup in team.data['participants']])
         dictToAttr(self, participantData)
+        self.name = [player['summonerName'] for player in team.players if player['id'] == self.esportsPlayerId][0]
