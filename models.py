@@ -1,4 +1,5 @@
 from lolesports_api.downloaders import downloadMeta, downloadDetails
+from lolesports_api.analysis import diffPlot
 import glob as _glob
 import json as _json
 import os as _os
@@ -158,6 +159,16 @@ class Game():
         self.blue = Team(self, 'blue')
 
         self.frames = self.json['frames']
+
+    def plotDiff(self, stat='totalGold', role=[]):
+        if role:
+            roleDiff = self.blue.__getattribute__(role).data.totalGold - self.red.__getattribute__(role).data.totalGold
+            title = f'{self.blue.__getattribute__(role).name} vs {self.red.__getattribute__(role).name}'
+            diffPlot(roleDiff, title=title)
+        else:
+            gameDiff = self.blue.data.totalGold - self.red.data.totalGold
+            title = f'{self.blue.name} vs {self.red.name}'
+            diffPlot(gameDiff, title=title)
 
 
 class Team():
