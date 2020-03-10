@@ -5,7 +5,7 @@ def downloadDetails(game_id):
     time_format = r'%Y-%m-%dT%H:%M:%SZ'
     windowApi = f'https://feed.lolesports.com/livestats/v1/window/{game_id}'
     detailApi = f'https://feed.lolesports.com/livestats/v1/details/{game_id}'
-    windowData = requests.get(windowApi).json()
+    windowData = _requests.get(windowApi).json()
     window_time = _datetime.strptime(windowData['frames'][-1]['rfc460Timestamp'].split('.')[0].split('Z')[0] + 'Z', time_format)
     # Round to the nearest 10 seconds per API requirements
     window_time = window_time - _timedelta(minutes=0, \

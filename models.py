@@ -133,7 +133,9 @@ class Game():
         except Exception as e:
             print(f'Failed to download {self.id}.')
             print(e)
-        self.parseData()
+        else:
+            self.loadData()
+            self.parseData()
 
     def loadData(self):
         fname = _glob.glob(f'*/*/{self.id}.json')
