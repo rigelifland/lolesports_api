@@ -40,3 +40,11 @@ All the games for a tournament or league can be downloaded automatically as well
 ```
 lcs.download() # Downloads all games for all tournaments in the LCS
 springSplit.download() # Downloads all (completed) games for spring split 2020
+```
+
+There are some basic analysis tools built in as well:
+```
+g = lol.League('lcs').getTournamentBySlug('lcs_2020_split1').getEventByTeamGame('c9', 13).getGameByNum(1)
+g.plotDiff()
+```
+![plot_difference](https://github.com/rigelifland/lolesports_api/blob/master/difference_plot.png?raw=true)
